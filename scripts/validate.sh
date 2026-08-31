@@ -12,7 +12,15 @@ fi
 
 echo "==> prometheus config"
 if [ -f prometheus/prometheus.yml ]; then
-  if docker run --rm -v "$PWD/prometheus:/etc/prometheus:ro" \
+  # Check if docker daemon is available
+  set +e
+  docker info >/dev/null 2>&1
+  daemon_rc=$?
+  set -e
+
+  if [ $daemon_rc -ne 0 ]; then
+    echo "    SKIP (docker daemon unavailable)"
+  elif docker run --rm -v "$PWD/prometheus:/etc/prometheus:ro" \
       --entrypoint promtool prom/prometheus:v2.53.0 \
       check config /etc/prometheus/prometheus.yml; then
     echo "    OK"
