@@ -66,7 +66,10 @@ def main() -> None:
 
     start_http_server(9611)
     while True:
-        collect(client)
+        try:
+            collect(client)
+        except Exception:
+            SCRAPE_SUCCESS.set(0)
         time.sleep(interval)
 
 
