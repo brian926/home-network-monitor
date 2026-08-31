@@ -1,0 +1,6 @@
+- targets:
+    - https://www.cloudflare.com
+    - https://www.google.com
+  labels:
+    module: http_2xx
+    role: cdn_edge

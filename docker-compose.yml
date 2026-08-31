@@ -58,6 +58,15 @@ services:
       - 8.8.8.8
       - 1.0.0.1
 
+  blackbox:
+    image: prom/blackbox-exporter:v0.25.0
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./blackbox:/config:ro
+    command:
+      - --config.file=/config/blackbox.yml
+
 volumes:
   prometheus-data:
   grafana-data:

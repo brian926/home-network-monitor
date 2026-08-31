@@ -1,0 +1,26 @@
+modules:
+  dns_pihole:
+    prober: dns
+    timeout: 5s
+    dns:
+      query_name: "cloudflare.com"
+      query_type: "A"
+      transport_protocol: "udp"
+      preferred_ip_protocol: "ip4"
+
+  dns_upstream:
+    prober: dns
+    timeout: 5s
+    dns:
+      query_name: "cloudflare.com"
+      query_type: "A"
+      transport_protocol: "udp"
+      preferred_ip_protocol: "ip4"
+
+  http_2xx:
+    prober: http
+    timeout: 10s
+    http:
+      valid_status_codes: [200]
+      method: GET
+      preferred_ip_protocol: "ip4"
