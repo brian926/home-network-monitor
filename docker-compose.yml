@@ -51,9 +51,9 @@ services:
       - NET_RAW
     command:
       - --privileged
-      - 192.168.1.1
+      - 192.168.1.1  # PLACEHOLDER — replace with real gateway IP before deploy
       - 192.168.100.1
-      - 192.168.1.2
+      - 192.168.1.2  # PLACEHOLDER — replace with real Pi-hole IP before deploy
       - 1.1.1.1
       - 8.8.8.8
       - 1.0.0.1
