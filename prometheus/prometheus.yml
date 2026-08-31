@@ -46,3 +46,8 @@ scrape_configs:
         target_label: instance
       - target_label: __address__
         replacement: host.docker.internal:9115
+
+  - job_name: mb8611
+    scrape_interval: 60s
+    static_configs:
+      - targets: ["mb8611-exporter:9611"]
