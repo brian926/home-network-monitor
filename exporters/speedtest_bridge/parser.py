@@ -55,9 +55,19 @@ def parse_latest_result(payload: dict) -> dict:
     created = datetime.fromisoformat(
         data["created_at"].replace("Z", "+00:00"))
 
+    # fromisoformat already parses an explicit UTC offset; .replace() would
+    # OVERWRITE that offset instead of converting through it, silently
+    # reinterpreting e.g. "...-04:00" as UTC and shifting the timestamp by
+    # the offset's magnitude (up to several hours). Only a naive timestamp
+    # (no offset) should be assumed to already be UTC.
+    if created.tzinfo is not None:
+        created_utc = created.astimezone(timezone.utc)
+    else:
+        created_utc = created.replace(tzinfo=timezone.utc)
+
     return {
         "download_bits_per_second": float(data["download"]) * BITS_PER_BYTE,
         "upload_bits_per_second": float(data["upload"]) * BITS_PER_BYTE,
         "ping_seconds": float(data["ping"]) / 1000.0,
-        "timestamp": int(created.replace(tzinfo=timezone.utc).timestamp()),
+        "timestamp": int(created_utc.timestamp()),
     }

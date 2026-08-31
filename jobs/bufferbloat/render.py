@@ -32,9 +32,9 @@ def render_metrics(
         f" {loaded_upload_ms / 1000:.6g}",
         "# HELP bufferbloat_grade Waveform-style grade, 0 best to 5 worst",
         "# TYPE bufferbloat_grade gauge",
-        f"bufferbloat_grade {grade}",
+        f'bufferbloat_grade{{target="{target}"}} {grade}',
         "# HELP bufferbloat_last_run_timestamp_seconds Unix time of last run",
         "# TYPE bufferbloat_last_run_timestamp_seconds gauge",
-        f"bufferbloat_last_run_timestamp_seconds {timestamp}",
+        f'bufferbloat_last_run_timestamp_seconds{{target="{target}"}} {timestamp}',
     ]
     return "\n".join(lines) + "\n"

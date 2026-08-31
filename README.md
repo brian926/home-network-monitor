@@ -12,6 +12,11 @@ Plan: `docs/superpowers/plans/2026-08-31-home-network-monitor.md`
     # fill in .env
     docker compose up -d
 
+Before deploying to the real host, follow the full checklist in
+[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — placeholder IPs, secret
+rotation, and hardware-specific verification steps that could not be
+completed in this environment.
+
 ## Validate
 
     ./scripts/validate.sh

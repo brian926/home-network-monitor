@@ -84,6 +84,17 @@
       "description": "mb8611_t3_timeouts_total is deliberately not emitted. An unlabeled gauge would export 0.0 and read as \"no timeouts, modem healthy\" — a false negative. Run the Step 1 HNAP discovery capture on apollo to locate the T3 field in the modem's response, then implement and re-enable this panel.",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 18 },
       "targets": [{ "expr": "mb8611_t3_timeouts_total" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Collector health — distinguishes 'collector down' from 'measured zero'",
+      "description": "Distinguishes 'collector down' from 'measured zero'.",
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 26 },
+      "fieldConfig": { "defaults": { "min": 0, "max": 1 } },
+      "targets": [
+        { "expr": "up{job=\"mb8611\"}", "legendFormat": "up" },
+        { "expr": "mb8611_scrape_success", "legendFormat": "mb8611 scrape" }
+      ]
     }
   ]
 }

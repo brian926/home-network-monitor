@@ -77,7 +77,7 @@ def measure_under_load(target: str, worker) -> float:
 
 def main() -> int:
     target = os.environ.get("BUFFERBLOAT_TARGET", "1.1.1.1")
-    pushgateway = os.environ.get("PUSHGATEWAY_URL", "http://pushgateway:9091")
+    pushgateway = os.environ.get("PUSHGATEWAY_URL", "http://localhost:9091")
 
     try:
         idle_ms = measure_rtt_ms(target, PING_COUNT_IDLE)

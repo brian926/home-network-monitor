@@ -33,6 +33,22 @@ def test_parse_converts_timestamp_to_unix_epoch():
     assert result["timestamp"] == 1788185163
 
 
+def test_parse_converts_offset_timestamp_to_correct_utc_epoch():
+    # 14:06:03 in -04:00 is 18:06:03 UTC — four hours later than if the
+    # offset were dropped and the wall-clock time were reinterpreted as UTC.
+    sample = {
+        "data": {
+            "id": 42,
+            "ping": 12.345,
+            "download": 115000000.0,
+            "upload": 4300000.0,
+            "created_at": "2026-08-31T14:06:03.000000-04:00",
+        }
+    }
+    result = parse_latest_result(sample)
+    assert result["timestamp"] == 1788199563
+
+
 def test_parse_raises_on_missing_data_key():
     with pytest.raises(ValueError):
         parse_latest_result({})

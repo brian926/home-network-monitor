@@ -27,7 +27,15 @@ def test_render_grades_on_the_worse_direction():
     # Download delta 33 ms (grade B), upload delta 3 ms (grade A+).
     # The worse of the two must win.
     text = render_metrics("1.1.1.1", 12.0, 45.0, 15.0, 1735689600)
-    assert "bufferbloat_grade 2" in text
+    assert 'bufferbloat_grade{target="1.1.1.1"} 2' in text
+
+
+def test_render_labels_grade_and_last_run_with_target():
+    # Without a target label, a second bufferbloat target would silently
+    # collapse into the same series as the first.
+    text = render_metrics("1.1.1.1", 12.0, 45.0, 38.0, 1735689600)
+    assert 'bufferbloat_grade{target="1.1.1.1"}' in text
+    assert 'bufferbloat_last_run_timestamp_seconds{target="1.1.1.1"} 1735689600' in text
 
 
 def test_render_ends_with_trailing_newline():

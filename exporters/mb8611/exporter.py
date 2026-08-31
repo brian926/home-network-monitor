@@ -30,6 +30,13 @@ SCRAPE_SUCCESS = Gauge("mb8611_scrape_success",
 def collect(client: MB8611Client) -> None:
     status = client.fetch_status()
     if not status:
+        # spec §10.4: absence must not render as a healthy value. Without
+        # this, prometheus_client keeps re-exporting the last good SNR/power
+        # readings forever, so a dead modem draws flat, confident, healthy
+        # lines on D2 even though mb8611_scrape_success has flipped to 0.
+        SNR.clear()
+        POWER.clear()
+        UNCORRECTABLE.clear()
         SCRAPE_SUCCESS.set(0)
         return
 
@@ -49,6 +56,23 @@ def collect(client: MB8611Client) -> None:
     SCRAPE_SUCCESS.set(1)
 
 
+def _parse_interval_seconds(raw: str) -> int:
+    """Parse MB8611_INTERVAL_SECONDS, treating empty/garbage as the 60s floor.
+
+    Docker Compose substitutes an EMPTY STRING (not "unset") for a ${VAR}
+    missing from .env, and int("") raises ValueError before
+    start_http_server runs — a crash loop with no metrics and no signal.
+    The 60s floor is a modem-safety requirement (spec §10.1: aggressive
+    polling can wedge the modem's web server) and must hold no matter what
+    garbage arrives here.
+    """
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        return 60
+    return max(60, value)
+
+
 def main() -> None:
     if os.environ.get("MB8611_ENABLED", "true").lower() != "true":
         print("MB8611_ENABLED is not true; exporter idling.", flush=True)
@@ -62,13 +86,19 @@ def main() -> None:
         username=os.environ["MB8611_USER"],
         password=os.environ["MB8611_PASS"],
     )
-    interval = max(60, int(os.environ.get("MB8611_INTERVAL_SECONDS", "60")))
+    interval = _parse_interval_seconds(os.environ.get("MB8611_INTERVAL_SECONDS", "60"))
 
     start_http_server(9611)
     while True:
         try:
             collect(client)
         except Exception:
+            # spec §10.4: absence must not render as a healthy value — clear
+            # the labelled gauges here too, since collect() can raise after
+            # a partial update (e.g. mid-loop parse failure).
+            SNR.clear()
+            POWER.clear()
+            UNCORRECTABLE.clear()
             SCRAPE_SUCCESS.set(0)
         time.sleep(interval)
 

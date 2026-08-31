@@ -59,7 +59,8 @@
       "fieldConfig": { "defaults": { "min": 0, "max": 1 } },
       "targets": [
         { "expr": "up", "legendFormat": "{{job}}" },
-        { "expr": "mb8611_scrape_success", "legendFormat": "mb8611 scrape" }
+        { "expr": "mb8611_scrape_success", "legendFormat": "mb8611 scrape" },
+        { "expr": "speedtest_bridge_scrape_success", "legendFormat": "speedtest bridge scrape" }
       ]
     }
   ]

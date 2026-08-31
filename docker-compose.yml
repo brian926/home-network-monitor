@@ -71,11 +71,11 @@ services:
     build: ./exporters/mb8611
     restart: unless-stopped
     environment:
-      MB8611_ENABLED: ${MB8611_ENABLED}
+      MB8611_ENABLED: ${MB8611_ENABLED:-true}
       MB8611_HOST: ${MB8611_HOST}
       MB8611_USER: ${MB8611_USER}
       MB8611_PASS: ${MB8611_PASS}
-      MB8611_INTERVAL_SECONDS: ${MB8611_INTERVAL_SECONDS}
+      MB8611_INTERVAL_SECONDS: ${MB8611_INTERVAL_SECONDS:-60}
     networks: [monitoring]
 
   pushgateway:
