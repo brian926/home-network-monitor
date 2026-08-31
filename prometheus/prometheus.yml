@@ -57,3 +57,8 @@ scrape_configs:
     scrape_interval: 30s
     static_configs:
       - targets: ["pushgateway:9091"]
+
+  - job_name: speedtest
+    scrape_interval: 60s
+    static_configs:
+      - targets: ["speedtest-bridge:9798"]

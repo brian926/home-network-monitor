@@ -96,6 +96,32 @@ services:
       BUFFERBLOAT_TARGET: ${BUFFERBLOAT_TARGET}
       PUSHGATEWAY_URL: http://localhost:9091
 
+  speedtest-tracker:
+    image: lscr.io/linuxserver/speedtest-tracker:0.21.2
+    restart: unless-stopped
+    environment:
+      PUID: 1000
+      PGID: 1000
+      APP_KEY: ${SPEEDTEST_APP_KEY}
+      APP_URL: ${SPEEDTEST_APP_URL}
+      DB_CONNECTION: sqlite
+      SPEEDTEST_SCHEDULE: ${SPEEDTEST_SCHEDULE}
+      DISPLAY_TIMEZONE: ${SPEEDTEST_TZ}
+    volumes:
+      - ./data/speedtest:/config
+    ports:
+      - "8080:80"
+    networks: [monitoring]
+
+  speedtest-bridge:
+    build: ./exporters/speedtest_bridge
+    restart: unless-stopped
+    environment:
+      SPEEDTEST_BASE_URL: http://speedtest-tracker:80
+      SPEEDTEST_API_TOKEN: ${SPEEDTEST_API_TOKEN}
+    depends_on: [speedtest-tracker]
+    networks: [monitoring]
+
 volumes:
   prometheus-data:
   grafana-data:
