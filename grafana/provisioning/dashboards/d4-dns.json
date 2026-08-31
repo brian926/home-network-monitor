@@ -1,0 +1,41 @@
+{
+  "title": "D4 — DNS & clients",
+  "uid": "hnm-d4-dns",
+  "timezone": "browser",
+  "refresh": "1m",
+  "time": { "from": "now-12h", "to": "now" },
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "DNS resolve time — Pi-hole vs upstream",
+      "description": "If the Pi-hole line sits materially above the upstream lines, DNS is the cause of 'pages hang then load fine'.",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "targets": [
+        {
+          "expr": "probe_dns_lookup_time_seconds",
+          "legendFormat": "{{instance}} ({{role}})"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Queries per client — COUNTS, NOT BYTES",
+      "description": "Finds an IoT device hammering DNS. Will NOT find a device streaming 4K — that is few queries and enormous traffic. Byte-level attribution needs flow data the current topology cannot provide (spec §2.5).",
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 10 },
+      "targets": [
+        {
+          "expr": "topk(10, rate(pihole_client_queries[5m]))",
+          "legendFormat": "{{client}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Block rate",
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 10 },
+      "fieldConfig": { "defaults": { "unit": "percent" } },
+      "targets": [{ "expr": "pihole_ads_percentage_today" }]
+    }
+  ]
+}

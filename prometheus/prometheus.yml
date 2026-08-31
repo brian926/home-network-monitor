@@ -62,3 +62,8 @@ scrape_configs:
     scrape_interval: 60s
     static_configs:
       - targets: ["speedtest-bridge:9798"]
+
+  - job_name: pihole
+    scrape_interval: 30s
+    static_configs:
+      - targets: ["pihole-exporter:9617"]

@@ -1,0 +1,66 @@
+{
+  "title": "D1 — Triage: is it the internet, or is it me?",
+  "uid": "hnm-d1-triage",
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Latency by hop — read the shape, not the number",
+      "description": "All six spike together: LAN or apollo. Flat to the modem then spikes: Comcast. Only Pi-hole: DNS. Only CDN: peering.",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": { "unit": "s", "custom": { "fillOpacity": 0 } }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (host, le) (rate(smokeping_response_duration_seconds_bucket[5m])))",
+          "legendFormat": "{{host}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Packet loss by hop",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0 } },
+      "targets": [
+        {
+          "expr": "1 - (rate(smokeping_response_duration_seconds_count[5m]) / rate(smokeping_requests_total[5m]))",
+          "legendFormat": "{{host}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "NIC health on enp7s0 — errors and drops",
+      "description": "Ruled out the switch chain in spec §2.7. Retained as regression detection: any sustained nonzero rate means a cable or switch has degraded since.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 },
+      "targets": [
+        {
+          "expr": "rate(node_network_receive_errs_total{device=\"enp7s0\"}[5m])",
+          "legendFormat": "rx errors"
+        },
+        {
+          "expr": "rate(node_network_transmit_errs_total{device=\"enp7s0\"}[5m])",
+          "legendFormat": "tx errors"
+        },
+        {
+          "expr": "rate(node_network_receive_drop_total{device=\"enp7s0\"}[5m])",
+          "legendFormat": "rx drops"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Collector health — distinguishes 'no data' from 'zero'",
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 18 },
+      "fieldConfig": { "defaults": { "min": 0, "max": 1 } },
+      "targets": [
+        { "expr": "up", "legendFormat": "{{job}}" },
+        { "expr": "mb8611_scrape_success", "legendFormat": "mb8611 scrape" }
+      ]
+    }
+  ]
+}

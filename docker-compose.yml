@@ -122,6 +122,16 @@ services:
     depends_on: [speedtest-tracker]
     networks: [monitoring]
 
+  pihole-exporter:
+    image: ekofr/pihole-exporter:v1.0.0
+    restart: unless-stopped
+    environment:
+      PIHOLE_PROTOCOL: http
+      PIHOLE_HOSTNAME: ${PIHOLE_HOST}
+      PIHOLE_PASSWORD: ${PIHOLE_APP_PASSWORD}
+      PORT: 9617
+    networks: [monitoring]
+
 volumes:
   prometheus-data:
   grafana-data:
