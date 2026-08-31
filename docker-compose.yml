@@ -78,6 +78,24 @@ services:
       MB8611_INTERVAL_SECONDS: ${MB8611_INTERVAL_SECONDS}
     networks: [monitoring]
 
+  pushgateway:
+    image: prom/pushgateway:v1.9.0
+    restart: unless-stopped
+    ports:
+      - "9091:9091"
+    networks: [monitoring]
+
+  bufferbloat:
+    build: ./jobs/bufferbloat
+    restart: unless-stopped
+    network_mode: host
+    cap_add:
+      - NET_RAW
+    environment:
+      BUFFERBLOAT_CRON: ${BUFFERBLOAT_CRON}
+      BUFFERBLOAT_TARGET: ${BUFFERBLOAT_TARGET}
+      PUSHGATEWAY_URL: http://localhost:9091
+
 volumes:
   prometheus-data:
   grafana-data:

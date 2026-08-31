@@ -51,3 +51,9 @@ scrape_configs:
     scrape_interval: 60s
     static_configs:
       - targets: ["mb8611-exporter:9611"]
+
+  - job_name: pushgateway
+    honor_labels: true
+    scrape_interval: 30s
+    static_configs:
+      - targets: ["pushgateway:9091"]
