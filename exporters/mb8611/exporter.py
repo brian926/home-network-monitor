@@ -14,7 +14,15 @@ POWER = Gauge("mb8611_channel_power_dbmv", "Channel power in dBmV",
               ["channel", "direction"])
 UNCORRECTABLE = Gauge("mb8611_uncorrectable_codewords_total",
                       "Uncorrectable codewords", ["channel"])
-T3_TIMEOUTS = Gauge("mb8611_t3_timeouts_total", "T3 timeout count")
+
+# mb8611_t3_timeouts_total is deliberately NOT declared.
+# An unlabeled prometheus_client Gauge exports 0.0 even when never set, which
+# would render as "no T3 timeouts, modem healthy" — a false negative on one of
+# the most diagnostic DOCSIS signals (spec §10.4: no-data must not look like a
+# healthy zero). The GetMotoStatusConnectionInfo response is already fetched by
+# client.py, but the field carrying T3 counts is unknown until the Step 1
+# discovery capture is run against the real modem on apollo. Declare and
+# populate this metric only once that capture identifies the field.
 SCRAPE_SUCCESS = Gauge("mb8611_scrape_success",
                        "1 if the last modem scrape succeeded, else 0")
 
