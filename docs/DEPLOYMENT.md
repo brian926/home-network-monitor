@@ -47,10 +47,55 @@ stack goes up on `apollo`; check each one off as you go.
    field order comes from a representative sample, **not** from this
    modem's actual firmware. Until it's reconciled against a real capture,
    D2's numbers are unverified — a mis-mapped field would put SNR in the
-   power column and read as confident nonsense. The capture script is
-   described in the task-5 notes (`.superpowers/sdd/2026-08-31-home-network-monitor/task-5-brief.md`).
-   It must also identify where T3 timeout counts live in the response,
-   which is what re-enables D2's currently-disabled T3 panel.
+   power column and read as confident nonsense. It must also identify
+   where T3 timeout counts live in the response, which is what re-enables
+   D2's currently-disabled T3 panel. Run the capture script below on
+   `apollo` against the real modem:
+
+   `YOUR_MODEM_PASSWORD` below is a placeholder — fill it in at run time
+   and never commit it. Do not run this script in a loop or on a timer:
+   the 60-second poll floor applies to manual runs too, not just the
+   exporter.
+
+   ```bash
+   python3 - <<'PY'
+   import hashlib, hmac, json, time, urllib3, requests
+   urllib3.disable_warnings()
+
+   HOST, USER, PASS = "192.168.100.1", "admin", "YOUR_MODEM_PASSWORD"
+   URL = f"https://{HOST}/HNAP1/"
+   s = requests.Session(); s.verify = False
+
+   def md5(key, data):
+       return hmac.new(key.encode(), data.encode(), hashlib.md5).hexdigest().upper()
+
+   r = s.post(URL, json={"Login": {"Action": "request", "Username": USER,
+           "LoginPassword": "", "Captcha": "", "PrivateLogin": "LoginPassword"}},
+       headers={"SOAPAction": '"http://purenetworks.com/HNAP1/Login"'}, timeout=10)
+   lr = r.json()["LoginResponse"]
+   challenge, pubkey, cookie = lr["Challenge"], lr["PublicKey"], lr["Cookie"]
+   privkey = md5(pubkey + PASS, challenge)
+   s.cookies.set("uid", cookie); s.cookies.set("PrivateKey", privkey)
+
+   ts = str(int(time.time() * 1000) % 2000000000000)
+   action = '"http://purenetworks.com/HNAP1/Login"'
+   s.post(URL, json={"Login": {"Action": "login", "Username": USER,
+           "LoginPassword": md5(privkey, challenge), "Captcha": "",
+           "PrivateLogin": "LoginPassword"}},
+       headers={"SOAPAction": action,
+                "HNAP_AUTH": f"{md5(privkey, ts + action)} {ts}"}, timeout=10)
+
+   ts = str(int(time.time() * 1000) % 2000000000000)
+   action = '"http://purenetworks.com/HNAP1/GetMultipleHNAPs"'
+   r = s.post(URL, json={"GetMultipleHNAPs": {
+           "GetMotoStatusDownstreamChannelInfo": "",
+           "GetMotoStatusUpstreamChannelInfo": "",
+           "GetMotoStatusConnectionInfo": ""}},
+       headers={"SOAPAction": action,
+                "HNAP_AUTH": f"{md5(privkey, ts + action)} {ts}"}, timeout=10)
+   print(json.dumps(r.json(), indent=2))
+   PY
+   ```
 
 7. **Run the speedtest-tracker API discovery.**
    `exporters/speedtest_bridge/parser.py`'s field names and units come from

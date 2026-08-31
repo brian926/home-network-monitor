@@ -92,8 +92,8 @@ services:
     cap_add:
       - NET_RAW
     environment:
-      BUFFERBLOAT_CRON: ${BUFFERBLOAT_CRON}
-      BUFFERBLOAT_TARGET: ${BUFFERBLOAT_TARGET}
+      BUFFERBLOAT_CRON: ${BUFFERBLOAT_CRON:-36 * * * *}
+      BUFFERBLOAT_TARGET: ${BUFFERBLOAT_TARGET:-1.1.1.1}
       PUSHGATEWAY_URL: http://localhost:9091
 
   speedtest-tracker:
