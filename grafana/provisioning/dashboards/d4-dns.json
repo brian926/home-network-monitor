@@ -11,7 +11,7 @@
     {
       "type": "timeseries",
       "title": "DNS resolve time — Pi-hole vs upstream",
-      "description": "If the Pi-hole line sits materially above the upstream lines, DNS is the cause of 'pages hang then load fine'.",
+      "description": "Actual DNS query round-trip. Uses probe_duration_seconds, NOT probe_dns_lookup_time_seconds — the latter measures resolving the target's own hostname and is always 0 when the target is an IP address. Your local resolver should BEAT the upstreams, because it caches. If the local_dns line sits above them, that is backwards and DNS is your bottleneck.",
       "gridPos": {
         "h": 10,
         "w": 24,
@@ -25,7 +25,7 @@
       },
       "targets": [
         {
-          "expr": "probe_dns_lookup_time_seconds",
+          "expr": "probe_duration_seconds{role=~\"local_dns|upstream_dns\"}",
           "legendFormat": "{{instance}} ({{role}})"
         }
       ]

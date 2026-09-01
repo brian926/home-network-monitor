@@ -264,6 +264,20 @@ password but is still LAN-only by design.
 Never port-forward any port in this stack. For access from outside your network,
 use a VPN or an overlay network such as Tailscale.
 
+### A metric that looks right and is not
+
+`probe_dns_lookup_time_seconds` sounds like the DNS query time. It is not — it
+measures resolving the *target's own hostname*, so when your probe targets are
+IP addresses it reports `0` forever. Use `probe_duration_seconds` filtered to
+the DNS roles instead:
+
+```promql
+probe_duration_seconds{role=~"local_dns|upstream_dns"} * 1000
+```
+
+D4 uses the correct one. Mentioned here because the wrong metric produces a
+confident flat-zero line rather than an obvious error.
+
 ## 13. Reaching it from other devices
 
 The stack ships a Caddy reverse proxy that puts every service under one
