@@ -63,6 +63,16 @@ hardware-specific checks, and the phased bring-up order.
 Checks Compose syntax, Prometheus config, the rendered target files, and the
 Python test suite.
 
+## Access
+
+A Caddy reverse proxy fronts everything on port 80 — `/grafana`,
+`/prometheus`, `/speedtest`, `/pushgateway`, with a landing page at `/`. Set
+`PROXY_HOSTNAME` in `.env` to a name your network resolves, and add a matching
+local DNS record (see `docs/DEPLOYMENT.md` section 13). Avoid `.local` names —
+mDNS support across devices is inconsistent.
+
+The per-service ports below stay published as a fallback.
+
 ## Ports
 
 All LAN-only. None of these should ever be port-forwarded — Prometheus in

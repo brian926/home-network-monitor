@@ -1,0 +1,62 @@
+# Reverse proxy putting every service under one hostname.
+# Hostname comes from PROXY_HOSTNAME in .env.
+#
+# Two proxying styles are used deliberately:
+#   handle_path  — strips the prefix; used where the app is told its external
+#                  URL but still serves from its own root
+#   handle       — keeps the prefix; used by Grafana, which serves from the
+#                  subpath itself (GF_SERVER_SERVE_FROM_SUB_PATH)
+
+# Listens on :80 for ANY hostname, so this works whether a device reaches the
+# server by DNS name (apollo.home), by mDNS (apollo.local), or by raw IP.
+# PROXY_HOSTNAME is still used by the apps themselves to generate absolute
+# links, so set it to the name you actually type.
+:80 {
+	encode gzip
+
+	# Grafana serves from the subpath itself — do NOT strip the prefix.
+	handle /grafana* {
+		reverse_proxy grafana:3000
+	}
+
+	# Prometheus is told its external URL but keeps route-prefix=/, so strip.
+	handle_path /prometheus* {
+		reverse_proxy prometheus:9090
+	}
+
+	handle_path /pushgateway* {
+		reverse_proxy pushgateway:9091
+	}
+
+	# Laravel app. Subpath support is imperfect; if assets 404, use port 8080.
+	handle_path /speedtest* {
+		reverse_proxy speedtest-tracker:80
+	}
+
+	handle / {
+		header Content-Type "text/html; charset=utf-8"
+		respond `<!doctype html>
+<meta charset="utf-8">
+<title>home-network-monitor</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 34rem;
+         margin: 4rem auto; padding: 0 1.5rem; }
+  h1 { font-size: 1.3rem; margin-bottom: .25rem; }
+  p.sub { color: #777; margin-top: 0; }
+  a { display: block; padding: .8rem 1rem; margin: .5rem 0;
+      border: 1px solid #8883; border-radius: .5rem;
+      text-decoration: none; color: inherit; }
+  a:hover { border-color: #8886; }
+  b { display: block; }
+  span { color: #777; font-size: .875rem; }
+</style>
+<h1>home-network-monitor</h1>
+<p class="sub">Network diagnostics for this house.</p>
+<a href="/grafana"><b>Grafana</b><span>Dashboards D1&ndash;D4 &mdash; start here</span></a>
+<a href="/prometheus"><b>Prometheus</b><span>Raw metrics, target health, PromQL</span></a>
+<a href="/speedtest"><b>Speedtest Tracker</b><span>Throughput history</span></a>
+<a href="/pushgateway"><b>Pushgateway</b><span>Bufferbloat job results</span></a>
+` 200
+	}
+}

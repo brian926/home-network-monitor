@@ -263,3 +263,63 @@ password but is still LAN-only by design.
 
 Never port-forward any port in this stack. For access from outside your network,
 use a VPN or an overlay network such as Tailscale.
+
+## 13. Reaching it from other devices
+
+The stack ships a Caddy reverse proxy that puts every service under one
+hostname on port 80:
+
+| Path | Service |
+|---|---|
+| `/` | Landing page with links |
+| `/grafana` | Grafana |
+| `/prometheus` | Prometheus |
+| `/speedtest` | Speedtest Tracker |
+| `/pushgateway` | Pushgateway |
+
+The published per-service ports (3000, 9090, 8080, 9091) still work and are a
+useful fallback when the proxy misbehaves.
+
+### Make the name resolve everywhere
+
+Avoid `.local`. That suffix is reserved for mDNS, and support is uneven —
+macOS and Windows handle it, Android is unreliable, and Linux needs
+`nss-mdns` installed. Some clients also bypass DNS entirely for `.local`,
+so a Pi-hole record for it may be ignored.
+
+Instead, add a **Local DNS record in Pi-hole**, which every device on the
+network already uses for DNS:
+
+1. Pi-hole admin → Settings → Local DNS Records
+2. Domain: `apollo.home` (or `monitor.lan`, or anything under `.home.arpa`)
+3. IP: the address of the host running this stack
+
+Then set `PROXY_HOSTNAME` in `.env` to that exact name and restart the proxy:
+
+```bash
+docker compose up -d caddy grafana prometheus pushgateway
+```
+
+`PROXY_HOSTNAME` matters because Grafana, Prometheus, and Pushgateway build
+absolute redirect and asset URLs from it. Caddy itself listens for any
+hostname, so the raw IP keeps working too.
+
+### Port 80 conflicts
+
+If a Kubernetes ingress controller or another web server already owns port 80
+on this host, Caddy will fail to start. Check first:
+
+```bash
+sudo ss -tlnp | grep ':80 '
+```
+
+Set `PROXY_PORT=8081` (or anything free) in `.env` and use
+`http://apollo.home:8081/` instead.
+
+### Known limitation: the speedtest path
+
+`/speedtest` proxies a Laravel application, and Laravel's subpath support is
+imperfect — asset URLs are generated from the app root. If the page loads
+without styling or the assets 404, set `SPEEDTEST_APP_URL` to the direct
+port form (`http://apollo.home:8080`) and use that port for this one service.
+Everything else is unaffected.
