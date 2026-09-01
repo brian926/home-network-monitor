@@ -3,21 +3,38 @@
   "uid": "hnm-d3-bufferbloat",
   "timezone": "browser",
   "refresh": "1m",
-  "time": { "from": "now-24h", "to": "now" },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
   "panels": [
     {
       "type": "timeseries",
       "title": "Latency increase under load — under 30ms fine, over 100ms explains buffering",
-      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "ms",
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 30 },
-              { "color": "red", "value": 100 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 30
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
             ]
           }
         }
@@ -32,7 +49,12 @@
     {
       "type": "stat",
       "title": "Bufferbloat grade (0 = A+, 5 = F)",
-      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 10 },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 10
+      },
       "fieldConfig": {
         "defaults": {
           "min": 0,
@@ -40,69 +62,130 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 2 },
-              { "color": "red", "value": 3 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 2
+              },
+              {
+                "color": "red",
+                "value": 3
+              }
             ]
           }
         }
       },
-      "targets": [{ "expr": "bufferbloat_grade" }]
+      "targets": [
+        {
+          "expr": "bufferbloat_grade"
+        }
+      ]
     },
     {
       "type": "stat",
       "title": "Minutes since last bufferbloat run",
       "description": "Pushed metrics persist after a job dies. A climbing value here means the job stopped and the grade above is stale.",
-      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 10 },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 10
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "m",
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "red", "value": 90 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
             ]
           }
         }
       },
       "targets": [
-        { "expr": "(time() - bufferbloat_last_run_timestamp_seconds) / 60" }
+        {
+          "expr": "(time() - bufferbloat_last_run_timestamp_seconds) / 60"
+        }
       ]
     },
     {
       "type": "stat",
       "title": "Minutes since last speedtest",
-      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 10 },
-      "fieldConfig": { "defaults": { "unit": "m" } },
-      "targets": [
-        { "expr": "(time() - speedtest_last_run_timestamp_seconds) / 60" }
-      ]
-    },
-    {
-      "type": "timeseries",
-      "title": "Speedtest throughput — capped at ~940 Mbps by apollo's 1GbE NIC",
-      "description": "This is a regression detector, not an SLA measurement. A drop to 400 Mbps is a real signal; 920 is a perfect score, not a shortfall.",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
-      "fieldConfig": { "defaults": { "unit": "bps" } },
-      "targets": [
-        { "expr": "speedtest_download_bits_per_second", "legendFormat": "download" },
-        { "expr": "speedtest_upload_bits_per_second", "legendFormat": "upload" }
-      ]
-    },
-    {
-      "type": "timeseries",
-      "title": "apollo NIC utilisation — discard measurements taken during these spikes",
-      "description": "When apollo's own workloads saturate its 1GbE link, every measurement from this host is skewed.",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
-      "fieldConfig": { "defaults": { "unit": "Bps" } },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 10
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "m"
+        }
+      },
       "targets": [
         {
-          "expr": "rate(node_network_receive_bytes_total{device=\"enp7s0\"}[5m])",
+          "expr": "(time() - speedtest_last_run_timestamp_seconds) / 60"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Speedtest throughput — capped by the monitoring host's own NIC speed",
+      "description": "This is a regression detector, not an SLA measurement. A drop to 400 Mbps is a real signal; 920 is a perfect score, not a shortfall.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps"
+        }
+      },
+      "targets": [
+        {
+          "expr": "speedtest_download_bits_per_second",
+          "legendFormat": "download"
+        },
+        {
+          "expr": "speedtest_upload_bits_per_second",
+          "legendFormat": "upload"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Monitoring host NIC utilisation — discard measurements taken during these spikes",
+      "description": "When this host's own traffic saturates its link, every measurement taken from it is skewed. Discard those windows.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps"
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(node_network_receive_bytes_total{device=\"$nic\"}[5m])",
           "legendFormat": "rx"
         },
         {
-          "expr": "rate(node_network_transmit_bytes_total{device=\"enp7s0\"}[5m])",
+          "expr": "rate(node_network_transmit_bytes_total{device=\"$nic\"}[5m])",
           "legendFormat": "tx"
         }
       ]
@@ -111,12 +194,50 @@
       "type": "timeseries",
       "title": "Collector health — distinguishes 'collector down' from 'measured zero'",
       "description": "Distinguishes 'collector down' from 'measured zero'.",
-      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 24 },
-      "fieldConfig": { "defaults": { "min": 0, "max": 1 } },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 1
+        }
+      },
       "targets": [
-        { "expr": "up{job=~\"pushgateway|speedtest\"}", "legendFormat": "{{job}}" },
-        { "expr": "speedtest_bridge_scrape_success", "legendFormat": "speedtest bridge scrape" }
+        {
+          "expr": "up{job=~\"pushgateway|speedtest\"}",
+          "legendFormat": "{{job}}"
+        },
+        {
+          "expr": "speedtest_bridge_scrape_success",
+          "legendFormat": "speedtest bridge scrape"
+        }
       ]
     }
-  ]
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "nic",
+        "label": "NIC",
+        "description": "Network interface on the monitoring host",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus"
+        },
+        "query": "label_values(node_network_receive_bytes_total, device)",
+        "definition": "label_values(node_network_receive_bytes_total, device)",
+        "refresh": 1,
+        "sort": 1,
+        "includeAll": false,
+        "multi": false,
+        "current": {},
+        "options": [],
+        "hide": 0
+      }
+    ]
+  }
 }

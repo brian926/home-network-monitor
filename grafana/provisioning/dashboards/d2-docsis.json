@@ -3,13 +3,21 @@
   "uid": "hnm-d2-docsis",
   "timezone": "browser",
   "refresh": "1m",
-  "time": { "from": "now-24h", "to": "now" },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
   "panels": [
     {
       "type": "timeseries",
       "title": "Uncorrectable codeword rate — the Comcast evidence panel",
       "description": "A rising rate is a plant fault: bad splitter, water in a connector, or an oversubscribed node. This is the panel to screenshot for support.",
-      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "targets": [
         {
           "expr": "rate(mb8611_uncorrectable_codewords_total[15m])",
@@ -20,16 +28,30 @@
     {
       "type": "timeseries",
       "title": "Downstream SNR — healthy above 35 dB for 256QAM",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 10
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "dB",
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 30 },
-              { "color": "green", "value": 35 }
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 30
+              },
+              {
+                "color": "green",
+                "value": 35
+              }
             ]
           }
         }
@@ -44,8 +66,17 @@
     {
       "type": "timeseries",
       "title": "Downstream power — healthy between -7 and +7 dBmV",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 },
-      "fieldConfig": { "defaults": { "unit": "dBm" } },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 10
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dBm"
+        }
+      },
       "targets": [
         {
           "expr": "mb8611_channel_power_dbmv{direction=\"downstream\"}",
@@ -57,16 +88,30 @@
       "type": "timeseries",
       "title": "Upstream power — healthy 35-49 dBmV, concerning above 52",
       "description": "High upstream power means the modem is shouting to be heard — a common signature of a failing line or too many splitters.",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 18 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 18
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "dBm",
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 49 },
-              { "color": "red", "value": 52 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 49
+              },
+              {
+                "color": "red",
+                "value": 52
+              }
             ]
           }
         }
@@ -81,19 +126,44 @@
     {
       "type": "stat",
       "title": "T3 timeouts — NOT YET COLLECTED (awaiting modem discovery)",
-      "description": "mb8611_t3_timeouts_total is deliberately not emitted. An unlabeled gauge would export 0.0 and read as \"no timeouts, modem healthy\" — a false negative. Run the Step 1 HNAP discovery capture on apollo to locate the T3 field in the modem's response, then implement and re-enable this panel.",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 18 },
-      "targets": [{ "expr": "mb8611_t3_timeouts_total" }]
+      "description": "mb8611_t3_timeouts_total is deliberately not emitted. An unlabeled gauge would export 0.0 and read as \"no timeouts, modem healthy\" — a false negative. Run the HNAP discovery capture in docs/DEPLOYMENT.md to locate the T3 field in the modem's response, then implement and re-enable this panel.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 18
+      },
+      "targets": [
+        {
+          "expr": "mb8611_t3_timeouts_total"
+        }
+      ]
     },
     {
       "type": "timeseries",
       "title": "Collector health — distinguishes 'collector down' from 'measured zero'",
       "description": "Distinguishes 'collector down' from 'measured zero'.",
-      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 26 },
-      "fieldConfig": { "defaults": { "min": 0, "max": 1 } },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 26
+      },
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 1
+        }
+      },
       "targets": [
-        { "expr": "up{job=\"mb8611\"}", "legendFormat": "up" },
-        { "expr": "mb8611_scrape_success", "legendFormat": "mb8611 scrape" }
+        {
+          "expr": "up{job=\"mb8611\"}",
+          "legendFormat": "up"
+        },
+        {
+          "expr": "mb8611_scrape_success",
+          "legendFormat": "mb8611 scrape"
+        }
       ]
     }
   ]

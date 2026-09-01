@@ -1,0 +1,15 @@
+# Rendered to dns.yml by scripts/setup.sh. Edit this template, not dns.yml.
+# Prometheus cannot expand environment variables in its own config, so the
+# addresses are substituted here at setup time from .env.
+- targets:
+    - ${PIHOLE_HOST}
+  labels:
+    module: dns_pihole
+    role: local_dns
+
+- targets:
+    - 1.1.1.1
+    - 8.8.8.8
+  labels:
+    module: dns_upstream
+    role: upstream_dns

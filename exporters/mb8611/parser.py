@@ -8,13 +8,13 @@ The field order encoded below (and the fixture in
 tests/fixtures/downstream.txt) was derived from a REPRESENTATIVE SAMPLE
 documented in the Task 5 brief, NOT from a live capture of this household's
 actual MB8611 firmware. Task 5 Step 1 (a discovery script that logs into the
-real modem at 192.168.100.1 and dumps its raw HNAP response) could not be
+real modem at your modem's management address and dumps its raw HNAP response) could not be
 run from this environment, because the modem is unreachable except from the
-deploy host (apollo).
+deploy host (the monitoring host).
 
 Before trusting any dashboard or alert built on these metrics, the repo
 owner MUST:
-  1. Run the Step 1 discovery script on apollo against the real modem.
+  1. Run the Step 1 discovery script on the monitoring host against the real modem.
   2. Compare the captured field order to the indices used in
      parse_downstream()/parse_upstream() below.
   3. Update this parser and its tests (test_parser.py, fixtures/downstream.txt)

@@ -5,3 +5,6 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .superpowers/
+
+# Rendered from .env by scripts/setup.sh
+prometheus/targets/dns.yml

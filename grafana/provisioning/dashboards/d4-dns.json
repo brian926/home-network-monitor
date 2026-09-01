@@ -3,14 +3,26 @@
   "uid": "hnm-d4-dns",
   "timezone": "browser",
   "refresh": "1m",
-  "time": { "from": "now-12h", "to": "now" },
+  "time": {
+    "from": "now-12h",
+    "to": "now"
+  },
   "panels": [
     {
       "type": "timeseries",
       "title": "DNS resolve time — Pi-hole vs upstream",
       "description": "If the Pi-hole line sits materially above the upstream lines, DNS is the cause of 'pages hang then load fine'.",
-      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
-      "fieldConfig": { "defaults": { "unit": "s" } },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        }
+      },
       "targets": [
         {
           "expr": "probe_dns_lookup_time_seconds",
@@ -22,7 +34,12 @@
       "type": "timeseries",
       "title": "Queries per client — COUNTS, NOT BYTES",
       "description": "Finds an IoT device hammering DNS. Will NOT find a device streaming 4K — that is few queries and enormous traffic. Byte-level attribution needs flow data the current topology cannot provide (spec §2.5). Metric name is unverified against the v6 exporter (ekofr/pihole-exporter:v1.0.0 exposes per-client counts as pihole_top_sources{source=...}, not pihole_client_queries) — this panel may be empty until confirmed.",
-      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 10 },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 10
+      },
       "targets": [
         {
           "expr": "topk(10, rate(pihole_top_sources[5m]))",
@@ -33,18 +50,44 @@
     {
       "type": "timeseries",
       "title": "Block rate",
-      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 10 },
-      "fieldConfig": { "defaults": { "unit": "percent" } },
-      "targets": [{ "expr": "pihole_ads_percentage_today" }]
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 10
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        }
+      },
+      "targets": [
+        {
+          "expr": "pihole_ads_percentage_today"
+        }
+      ]
     },
     {
       "type": "timeseries",
       "title": "Collector health — distinguishes 'collector down' from 'measured zero'",
       "description": "Distinguishes 'collector down' from 'measured zero'.",
-      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 20 },
-      "fieldConfig": { "defaults": { "min": 0, "max": 1 } },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 20
+      },
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 1
+        }
+      },
       "targets": [
-        { "expr": "up{job=~\"blackbox_dns|pihole\"}", "legendFormat": "{{job}}" }
+        {
+          "expr": "up{job=~\"blackbox_dns|pihole\"}",
+          "legendFormat": "{{job}}"
+        }
       ]
     }
   ]

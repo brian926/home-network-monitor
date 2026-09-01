@@ -8,7 +8,7 @@ brief, NOT from a live capture of this deployment's actual speedtest-tracker
 instance. Task 7 Step 5 (a discovery script that queries the running
 container's /api/v1/results/latest endpoint with a bearer token) could not
 be run from this environment, because the container is reachable only from
-the deploy host (apollo).
+the deploy host (the monitoring host).
 
 The speedtest-tracker API shape is version-dependent — older versions have
 been observed reporting bits per second where newer versions report bytes
@@ -16,7 +16,7 @@ per second, and field names can shift between releases (spec §10.2).
 
 Before trusting any dashboard or alert built on these metrics, the repo
 owner MUST:
-  1. Run the Step 5 discovery command on apollo against the real,
+  1. Run the Step 5 discovery command on the monitoring host against the real,
      running speedtest-tracker instance:
        source .env
        curl -s -H "Authorization: Bearer ${SPEEDTEST_API_TOKEN}" \

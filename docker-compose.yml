@@ -49,14 +49,10 @@ services:
     network_mode: host
     cap_add:
       - NET_RAW
-    command:
-      - --privileged
-      - 192.168.1.1  # PLACEHOLDER — replace with real gateway IP before deploy
-      - 192.168.100.1
-      - 192.168.1.2  # PLACEHOLDER — replace with real Pi-hole IP before deploy
-      - 1.1.1.1
-      - 8.8.8.8
-      - 1.0.0.1
+    # Targets come from SMOKEPING_TARGETS in .env (space-separated). String form
+    # is deliberate: Compose substitutes the variable, then the value is split
+    # into arguments, so the number of targets is not fixed by this file.
+    command: --privileged ${SMOKEPING_TARGETS}
 
   blackbox:
     image: prom/blackbox-exporter:v0.25.0

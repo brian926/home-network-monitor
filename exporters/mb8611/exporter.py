@@ -21,7 +21,7 @@ UNCORRECTABLE = Gauge("mb8611_uncorrectable_codewords_total",
 # the most diagnostic DOCSIS signals (spec §10.4: no-data must not look like a
 # healthy zero). The GetMotoStatusConnectionInfo response is already fetched by
 # client.py, but the field carrying T3 counts is unknown until the Step 1
-# discovery capture is run against the real modem on apollo. Declare and
+# discovery capture is run against the real modem on the monitoring host. Declare and
 # populate this metric only once that capture identifies the field.
 SCRAPE_SUCCESS = Gauge("mb8611_scrape_success",
                        "1 if the last modem scrape succeeded, else 0")

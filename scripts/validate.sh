@@ -29,6 +29,13 @@ if [ -f prometheus/prometheus.yml ]; then
   fi
 fi
 
+echo "==> rendered target files"
+if [ -f prometheus/targets/dns.yml ]; then
+  echo "    OK"
+else
+  echo "    FAIL (run ./scripts/setup.sh first)"; fail=1
+fi
+
 echo "==> python tests"
 set +e
 python3 -m pytest -q
