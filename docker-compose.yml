@@ -93,7 +93,14 @@ services:
       PUSHGATEWAY_URL: http://localhost:9091
 
   speedtest-tracker:
-    image: lscr.io/linuxserver/speedtest-tracker:0.21.2
+    # Deliberately unpinned, unlike every other image here. Upstream persists
+    # generated configs in /config and never downgrades them, so a pinned older
+    # version breaks against configs written by a newer one.
+    # Trade-off: a pull can change the app underneath you. If D3's throughput
+    # panel goes empty or wrong after an upgrade, check that the API shape
+    # exporters/speedtest_bridge/parser.py expects still holds — see
+    # docs/DEPLOYMENT.md section 9.
+    image: lscr.io/linuxserver/speedtest-tracker:latest
     restart: unless-stopped
     environment:
       PUID: 1000

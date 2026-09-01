@@ -83,7 +83,17 @@ time you change an address in `.env`.
 
 ## 5. Migrating an existing speedtest-tracker
 
-Skip if you do not already run one. If you do, preserve its history:
+Skip if you do not already run one.
+
+**Note on versions:** `speedtest-tracker` is the one image here that is
+deliberately not pinned. Upstream persists its generated nginx and app configs
+into `/config` and never downgrades them, so pinning an older version against a
+`/config` written by a newer one fails at startup with
+`nginx: [emerg] unknown directive "http3"` or similar. If you hit that, either
+move `./data/speedtest/nginx` aside so it regenerates, or start with a clean
+`./data/speedtest`.
+
+If you want to keep an existing deployment's history:
 
 ```bash
 docker stop speedtest-tracker
