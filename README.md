@@ -56,6 +56,21 @@ directly. Re-run it whenever you change an address in `.env`.
 covers the values you must supply, the credential rotation you should do, the
 hardware-specific checks, and the phased bring-up order.
 
+## Finding intermittent faults
+
+    python scripts/analyze.py --hours 24
+    python scripts/analyze.py --from "2026-09-01 17:30" --to "2026-09-01 19:15" --step 120
+
+Averages hide short events. A router dropping 40% of packets for half an hour is
+invisible in a 24-hour mean *and* in a 10-minute snapshot taken at the wrong
+moment. `analyze.py` walks the window at a fine step and reports the worst value
+per target with a timestamp, so brief faults surface.
+
+It also tells you *where* the fault is, by comparing paths: if everything
+degrades except a LAN host reachable without crossing the router, the router is
+at fault. If only public targets degrade while the gateway stays clean, it is
+the ISP.
+
 ## Validate
 
     ./scripts/validate.sh
